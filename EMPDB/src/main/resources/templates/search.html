@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="header::head(~{::title})">
+<meta charset="UTF-8">
+<link th:href="@{/webjars/bootstrap/5.1.3/css/bootstrap.min.css}" rel="stylesheet"/>
+<title>従業員データベース</title>
+</head>
+<body>
+	<header th:replace="header::header"></header>
+	<div class="container">
+		<form class="d-flex" method="post" th:action="@{search}">
+        	<input class="form-control me-2" type="text" name="empName" th:value="*{empName}" placeholder="従業員名から検索" aria-label="Search"></input>
+        	<input class="form-control me-2" type="text" name="empName_kana" th:value="*{empName_kana}" placeholder="従業員カナ名から検索" aria-label="Search"></input>
+        	<input class="form-control me-2" type="text" name="companyName" th:value="*{companyName}" placeholder="法人名から検索" aria-label="Search"></input>
+        	<button class="btn btn-outline-primary" type="submit">検索</button>
+      	</form>
+		<h3 class="my-2">検索結果</h3>
+		<table class="table table-bordered table-striped">
+        <tr>
+            <th>氏名</th>
+            <th>法人</th>
+            <th>拠点統括</th>
+            <th>拠点</th>
+            <th>役職</th>
+            <th>職務</th>
+            <th>雇用体系</th>
+            <th>在職状況</th>
+            <th>入社日</th>
+            <th></th>
+        </tr>
+        <tr th:each="list : ${employeeList}">
+        	<td th:text="${list.name}"></td>
+        	<td th:text="${list.company_name}"></td>
+        	<td th:text="${list.gen_bra_name}"></td>
+        	<td th:text="${list.branch_name}"></td>
+            <td th:text="${list.official_position}"></td>
+            <td th:text="${list.emp_job_name}"></td>
+            <td th:text="${list.employment_type}"></td>
+            <td th:text="${list.status}"></td>
+            <td th:text="${list.entering_date}"></td>
+            <td>
+            	<a class="btn btn-primary" th:href="@{'/employeeDetail/' + ${list.id}}">詳細</a>
+            </td>
+        </tr>
+    </table>
+	</div>
+    
+    <script th:href="@{/webjars/jquery/3.3.1/js/jquery.min.js}"></script>
+    <script th:href="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+</body>
+</html>

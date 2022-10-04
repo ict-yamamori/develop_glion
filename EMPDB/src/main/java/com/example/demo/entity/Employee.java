@@ -1,6 +1,6 @@
 package com.example.demo.entity;
 
-import java.util.Date;
+import java.sql.Date;
 
 import lombok.Data;
 
@@ -25,4 +25,13 @@ public class Employee {
 	private String employment_type;
 	private Date start_date;
 	private Date end_date;
+	
+	private Integer employee_id;
+	private Integer business_org_id;
+	private Integer division_id;
+	private Integer company_id;
+	private Integer gen_bra_id;
+	private Integer branch_id;
+	private Integer emp_job_id;
+	private boolean org_kbn;
 }

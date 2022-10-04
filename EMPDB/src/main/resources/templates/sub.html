@@ -10,49 +10,33 @@
 	<div class="container">
 		<div class="col-sm-5">
 	        <div class="page-header">
-	            <h2>従業員登録</h2>
+	            <h2>兼務情報登録</h2>
 	        </div>
-	        <form method="post" th:object="${employee}" th:action="@{postCreate}">
+	        <form method="post" th:object="${employee}" th:action="@{'/employeeDetail/' + ${employee.id} + '/sub'}">
 	            <table class="table table-bordered table-hover">
-	                <tr>
+	            	<tr>
 	                    <th class="active">氏名</th>
-	                    <td>
-	                        <div class="form-group">
-	                            <input type="text" class="form-control" th:field="*{name}"></input>
-	                        </div>
-	                    </td>
+	                    <td th:text="${employee.name}"></td>
 	                </tr>
 	                <tr>
 	                    <th class="active">フリガナ</th>
-	                    <td>
-	                        <div class="form-group">
-	                            <input type="text" class="form-control" th:field="*{name_kana}"></input>
-	                        </div>
-	                    </td>
+	                    <td th:text="${employee.name_kana}"></td>
 	                </tr>
 	                <tr>
 	                    <th class="active">電話番号</th>
-	                    <td>
-	                        <div class="form-group">
-	                            <input type="text" class="form-control" th:field="*{telephonenumber}"></input>
-	                        </div>
-	                    </td>
+	                    <td th:text="${employee.telephonenumber}"></td>
 	                </tr>
 	                <tr>
 	                    <th class="active">メールアドレス</th>
-	                    <td>
-	                        <div class="form-group">
-	                            <input type="text" class="form-control" th:field="*{mailaddress}"></input>
-	                        </div>
-	                    </td>
+	                    <td th:text="${employee.mailaddress}"></td>
+	                </tr>
+	                <tr>
+	                    <th class="active">在職状況</th>
+	                    <td th:text="${employee.status}"></td>
 	                </tr>
 	                <tr>
 	                    <th class="active">グループ入社日</th>
-	                    <td>
-	                        <div class="form-group">
-	                            <input type="date" class="form-control" th:field="*{entering_date}"></input>
-	                        </div>
-	                    </td>
+	                    <td th:text="${#dates.format(employee.entering_date,'yyyy/MM/dd')}"></td>
 	                </tr>
 	                <tr>
 	                    <th class="active">事業本部</th>
@@ -62,7 +46,8 @@
 		                            <option
 		                             th:each="bus_org : ${bus_org}"
 		                             th:value="${bus_org.business_org_id}"
-		                             th:text="${bus_org.business_org_name}">
+		                             th:text="${bus_org.business_org_name}"
+		                             th:selected="${bus_org.business_org_name} == *{business_org_name}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -77,7 +62,8 @@
 		                            <option
 		                             th:each="division : ${division}"
 		                             th:value="${division.division_id}"
-		                             th:text="${division.division_name}">
+		                             th:text="${division.division_name}"
+		                             th:selected="${division.division_name} == *{division_name}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -91,7 +77,8 @@
 		                            <option
 		                             th:each="company : ${company}"
 		                             th:value="${company.company_id}"
-		                             th:text="${company.company_name}">
+		                             th:text="${company.company_name}"
+		                             th:selected="${company.company_name} == *{company_name}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -106,7 +93,8 @@
 		                            <option
 		                             th:each="genBra : ${genBra}"
 		                             th:value="${genBra.gen_bra_id}"
-		                             th:text="${genBra.gen_bra_name}">
+		                             th:text="${genBra.gen_bra_name}"
+		                             th:selected="${genBra.gen_bra_name} == *{gen_bra_name}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -121,7 +109,8 @@
 		                            <option
 		                             th:each="branch : ${branch}"
 		                             th:value="${branch.branch_id}"
-		                             th:text="${branch.branch_name}">
+		                             th:text="${branch.branch_name}"
+		                             th:selected="${branch.branch_name} == *{branch_name}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -140,10 +129,12 @@
 	                    <td>
 	                        <div class="form-group">
 	                        	<select id="emp_job" name="emp_job_id">
+	                        	<option value="" selected></option>
 		                            <option
 		                             th:each="empJob : ${empJob}"
 		                             th:value="${empJob.emp_job_id}"
-		                             th:text="${empJob.emp_job_name}">
+		                             th:text="${empJob.emp_job_name}"
+		                             th:selected="${empJob.emp_job_name} == *{emp_job_name}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -162,10 +153,12 @@
 	                    <td>
 	                        <div class="form-group">
 	                            <select id="employment_type" name="employment_type">
+	                            <option value="" selected></option>
 	                            <option
 	                            	th:each="employmentType : ${employmentType}"
 	                            	th:value="${employmentType.key}"
-							      	th:text="${employmentType.value}">
+							      	th:text="${employmentType.value}"
+							      	th:selected="${employmentType.value} == *{employment_type}">
 							    </option>
 	                            </select>
 	                        </div>
@@ -175,9 +168,7 @@
 	                    <th class="active">所属区分</th>
 	                    <td>
 	                        <div class="form-group">
-	                            <div th:each="item : ${radioButton}" class="form-check-inline">
-		                            <input type="radio"  class="form-check-input" th:text="${item.value}" th:value="${item.key}" th:field="*{org_kbn}">
-		                        </div>
+	                            <a>兼務</a>
 	                        </div>
 	                    </td>
 	                </tr>
@@ -191,7 +182,7 @@
 	                </tr>
 	            </table>
 	
-	            <button class="btn btn-primary" type="submit">登録</button>
+	            <button class="btn btn-primary" type="submit">兼務情報登録</button>
 	        </form>
 	    </div>
 	 </div>
