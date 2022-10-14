@@ -22,7 +22,10 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 	public Employee selectOne(String id) throws DataAccessException {
 		
 		//一件取得
-		Map<String, Object> map = jdbcTemplate.queryForMap("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,replace(m_employee.leaving_date,'0000-00-00',NULL),employment_type, org_kbn,m_employee.mail_address,m_employee.telephone_number,m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,start_date,replace(end_date,'0000-00-00',NULL) FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id" + " where t_orgnization.id = ?", id);
+		Map<String, Object> map = jdbcTemplate.queryForMap("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type, org_kbn,m_employee.mail_address,m_employee.telephone_number,m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,start_date,end_date,m_company.company_name FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id" + " where t_orgnization.id = ?", id);
+		
+		//出向情報のみ別SQLで取得（一括でやる方法わからない）
+		Map<String, Object> second_comp = jdbcTemplate.queryForMap("select m_company.company_name from t_orgnization LEFT OUTER JOIN m_company ON m_company.id = t_orgnization.second_company_id" + " where t_orgnization.id = ?", id);
 		
 		//結果返却用の変数
 		Employee employee = new Employee();
@@ -48,6 +51,7 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 		employee.setStart_date((Date) map.get("start_date"));
 		employee.setEnd_date((Date) map.get("end_date"));
 		employee.setOrg_kbn((boolean) map.get("org_kbn"));
+		employee.setSecond_company_name((String) second_comp.get("company_name"));
 		
 		return employee;
 	}

@@ -1,14 +1,11 @@
 package com.example.demo.entity;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.Data;
 
-@JsonPropertyOrder({"名前","フリガナ","在職状況","グループ入社日","グループ退職日","雇用体系","メールアドレス","電話番号","事業本部","事業部","法人","拠点統括","拠点","部署","役職","職務","所属区分","所属開始日","所属終了日"})
+@JsonPropertyOrder({"名前","フリガナ","在職状況","グループ入社日","グループ退職日","雇用体系","メールアドレス","電話番号","事業本部","事業部","法人","拠点統括","拠点","部署","役職","職務","所属区分","所属開始日","所属終了日","出向先"})
 @Data
 public class csvExport {
 	@JsonProperty("名前")
@@ -18,11 +15,11 @@ public class csvExport {
 	@JsonProperty("在職状況")
 	private String status;
 	@JsonProperty("グループ入社日")
-	@JsonFormat(pattern = "yyyy/MM/dd")
-	private Date entering_date;
+	//@JsonFormat(pattern = "yyyy/MM/dd")
+	private String entering_date;
 	@JsonProperty("グループ退職日")
-	@JsonFormat(pattern = "yyyy/MM/dd")
-	private Date leaving_date;
+	//@JsonFormat(pattern = "yyyy/MM/dd")
+	private String leaving_date;
 	@JsonProperty("雇用体系")
 	private String employment_type;
 	@JsonProperty("メールアドレス")
@@ -46,20 +43,23 @@ public class csvExport {
 	@JsonProperty("職務")
 	private String emp_job;
 	@JsonProperty("所属区分")
-	private String bus_org;
+	private String org_kbn;
 	@JsonProperty("所属開始日")
-	@JsonFormat(pattern = "yyyy/MM/dd")
-	private Date start_date;
+	//@JsonFormat(pattern = "yyyy/MM/dd")
+	private String start_date;
 	@JsonProperty("所属終了日")
-	@JsonFormat(pattern = "yyyy/MM/dd")
-	private Date end_date;
+	//@JsonFormat(pattern = "yyyy/MM/dd")
+	private String end_date;
+	@JsonProperty("出向先")
+	private String second_company;
+	
 	
 	public csvExport() {}
 
-	public csvExport(String name, String name_kana, String status, Date entering_date, Date leaving_date,
+	public csvExport(String name, String name_kana, String status, String entering_date, String leaving_date,
 			String employment_type, String mail_address, String telephone_number, String business_org, String division,
 			String company, String general_branch, String branch, String department, String official_position,
-			String emp_job, String bus_org, Date start_date, Date end_date) {
+			String emp_job, String org_kbn, String start_date, String end_date, String second_company) {
 		
 		this.name = name;
 		this.name_kana = name_kana;
@@ -77,8 +77,10 @@ public class csvExport {
 		this.department = department;
 		this.official_position = official_position;
 		this.emp_job = emp_job;
-		this.bus_org = bus_org;
+		this.org_kbn = org_kbn;
 		this.start_date = start_date;
 		this.end_date = end_date;
+		this.second_company = second_company;
 	}
+	
 }

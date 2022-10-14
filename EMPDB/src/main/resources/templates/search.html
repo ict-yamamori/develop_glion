@@ -8,36 +8,88 @@
 <body>
 	<header th:replace="header::header"></header>
 	<div class="container">
-		<form class="d-flex" method="post" th:action="@{search}">
-        	<input class="form-control me-2" type="text" name="empName" th:value="*{empName}" placeholder="従業員名から検索" aria-label="Search"></input>
-        	<input class="form-control me-2" type="text" name="empName_kana" th:value="*{empName_kana}" placeholder="従業員カナ名から検索" aria-label="Search"></input>
-        	<input class="form-control me-2" type="text" name="companyName" th:value="*{companyName}" placeholder="法人名から検索" aria-label="Search"></input>
-        	<button class="btn btn-outline-primary" type="submit">検索</button>
+		<form class="d-flex" method="GET" th:action="@{search}">
+			<div class="mx-2">
+			<label class="form-label">従業員名</label>
+        	<input type="text" class="form-control" name="empName" th:value="*{empName}" placeholder="従業員名から検索" aria-label="Search"></input>
+        	</div>
+        	<div class="mx-2">
+        	<label class="form-label">従業員名（フリガナ）</label>
+        	<input type="text" class="form-control" name="empName_kana" th:value="*{empName_kana}" placeholder="従業員カナ名から検索" aria-label="Search"></input>
+        	</div>
+        	<div class="mx-2">
+        	<label class="form-label">法人名</label>
+        	<input type="text" class="form-control" name="companyName" th:value="*{companyName}" placeholder="法人名から検索" aria-label="Search"></input>
+        	</div>
+        	<button class="btn btn-secondary" type="submit">検索</button>
       	</form>
 		<h3 class="my-2">検索結果</h3>
+		<form id="csvform" method="GET" th:action="@{/employee_data.csv}" th:object="${csvForm}">
+          <div th:each="list:${employeeList}">
+            <input type="hidden" name="name" th:value="${list.name}">
+            <input type="hidden" name="name_kana" th:value="${list.name_kana}">
+            <input type="hidden" name="status" th:value="${list.status}">
+            <input type="hidden" name="entering_date" th:value="${list.entering_date}">
+            <input type="hidden" name="leaving_date" th:value="${list.leaving_date}">
+            <input type="hidden" name="employment_type" th:value="${list.employment_type}">
+            <input type="hidden" name="mail_address" th:value="${list.mail_address}">
+            <input type="hidden" name="telephone_number" th:value="${list.telephone_number}">
+            <input type="hidden" name="business_org" th:value="${list.business_org_name}">
+            <input type="hidden" name="division" th:value="${list.division_name}">
+            <input type="hidden" name="company" th:value="${list.company_name}">
+            <input type="hidden" name="general_branch" th:value="${list.gen_bra_name}">
+            <input type="hidden" name="branch" th:value="${list.branch_name}">
+            <input type="hidden" name="department" th:value="${list.department}">
+            <input type="hidden" name="official_position" th:value="${list.official_position}">
+            <input type="hidden" name="emp_job" th:value="${list.emp_job_name}">
+            <input type="hidden" name="org_kbn" th:value="${list.org_kbn}">
+            <input type="hidden" name="start_date" th:value="${list.start_date}">
+            <input type="hidden" name="end_date" th:value="${list.end_date}">
+            <input type="hidden" name="second_company" th:value="${list.B}">
+          </div>
+          <button type="submit">CSVダウンロード</button>
+        </form>
 		<table class="table table-bordered table-striped">
         <tr>
             <th>氏名</th>
+            <th>在職状況</th>
+            <th>グループ入社日</th>
+            <th>グループ退職日</th>
+            <th>雇用体系</th>
+            <th>メールアドレス</th>
+            <th>電話番号</th>
+            <th>事業本部</th>
+            <th>事業部</th>
             <th>法人</th>
             <th>拠点統括</th>
             <th>拠点</th>
+            <th>部署</th>
             <th>役職</th>
             <th>職務</th>
-            <th>雇用体系</th>
-            <th>在職状況</th>
-            <th>入社日</th>
+            <th>所属開始日</th>
+            <th>所属終了日</th>
+            <th>出向先</th>
             <th></th>
         </tr>
         <tr th:each="list : ${employeeList}">
         	<td th:text="${list.name}"></td>
+        	<td th:text="${list.status}"></td>
+        	<td th:text="${list.entering_date}"></td>
+        	<td th:text="${list.leaving_date}"></td>
+        	<td th:text="${list.employment_type}"></td>
+        	<td th:text="${list.mail_address}"></td>
+        	<td th:text="${list.telephone_number}"></td>
+        	<td th:text="${list.business_org_name}"></td>
+        	<td th:text="${list.division_name}"></td>
         	<td th:text="${list.company_name}"></td>
         	<td th:text="${list.gen_bra_name}"></td>
         	<td th:text="${list.branch_name}"></td>
+        	<td th:text="${list.department}"></td>
             <td th:text="${list.official_position}"></td>
             <td th:text="${list.emp_job_name}"></td>
-            <td th:text="${list.employment_type}"></td>
-            <td th:text="${list.status}"></td>
-            <td th:text="${list.entering_date}"></td>
+            <td th:text="${list.start_date}"></td>
+            <td th:text="${list.end_date}"></td>
+            <td th:text="${list.B}"></td>
             <td>
             	<a class="btn btn-primary" th:href="@{'/employeeDetail/' + ${list.id}}">詳細</a>
             </td>

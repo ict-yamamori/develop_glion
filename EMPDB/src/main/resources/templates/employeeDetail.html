@@ -59,8 +59,8 @@
 	        	<td th:text="${employee.emp_job_name}"></td>
 	        </tr>
 	        <tr>
-	        	<th></th>
-	        	<td></td>
+	        	<th>出向先法人名</th>
+	        	<td th:text="${employee.second_company_name}"></td>
 	        	<th>所属開始日</th>
 	        	<td th:text="${#dates.format(employee.start_date,'yyyy/MM/dd')}"></td>
 	        </tr>

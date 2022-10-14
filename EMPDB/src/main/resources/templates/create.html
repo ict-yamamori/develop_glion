@@ -12,13 +12,20 @@
 	        <div class="page-header">
 	            <h2>従業員登録</h2>
 	        </div>
-	        <form method="post" th:object="${employee}" th:action="@{postCreate}">
+	        <!-- エラーメッセージの一覧表示 -->
+            <ul>
+                <li th:each="error : ${#fields.detailedErrors()}">
+                    <span th:text="${error.message}">Error message</span>
+                </li>
+            </ul>
+	        <form method="post" th:object="${employee}" th:action="@{postCreate}" novalidate>
 	            <table class="table table-bordered table-hover">
 	                <tr>
 	                    <th class="active">氏名</th>
 	                    <td>
 	                        <div class="form-group">
 	                            <input type="text" class="form-control" th:field="*{name}"></input>
+	                        	<span class="errorStr" th:errors="*{name}"></span>
 	                        </div>
 	                    </td>
 	                </tr>
@@ -27,6 +34,7 @@
 	                    <td>
 	                        <div class="form-group">
 	                            <input type="text" class="form-control" th:field="*{name_kana}"></input>
+	                        	<span class="errorStr" th:errors="*{name_kana}"></span>
 	                        </div>
 	                    </td>
 	                </tr>
@@ -51,6 +59,7 @@
 	                    <td>
 	                        <div class="form-group">
 	                            <input type="date" class="form-control" th:field="*{entering_date}"></input>
+	                        	<span class="errorStr" th:errors="*{entering_date}"></span>
 	                        </div>
 	                    </td>
 	                </tr>
@@ -62,9 +71,11 @@
 		                            <option
 		                             th:each="bus_org : ${bus_org}"
 		                             th:value="${bus_org.business_org_id}"
-		                             th:text="${bus_org.business_org_name}">
+		                             th:text="${bus_org.business_org_name}"
+		                             th:field="*{business_org_id}">
 		                            </option>
 		                         </select>
+		                         <span class="errorStr" th:errors="*{business_org_name}"></span>
 	                        </div>
 	                    </td>
 	                </tr>
@@ -77,7 +88,8 @@
 		                            <option
 		                             th:each="division : ${division}"
 		                             th:value="${division.division_id}"
-		                             th:text="${division.division_name}">
+		                             th:text="${division.division_name}"
+		                             th:field="*{division_id}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -91,9 +103,11 @@
 		                            <option
 		                             th:each="company : ${company}"
 		                             th:value="${company.company_id}"
-		                             th:text="${company.company_name}">
+		                             th:text="${company.company_name}"
+		                             th:field="*{company_id}">
 		                            </option>
 		                         </select>
+		                         <span class="errorStr" th:errors="*{company_name}"></span>
 	                        </div>
 	                    </td>
 	                </tr>
@@ -106,7 +120,8 @@
 		                            <option
 		                             th:each="genBra : ${genBra}"
 		                             th:value="${genBra.gen_bra_id}"
-		                             th:text="${genBra.gen_bra_name}">
+		                             th:text="${genBra.gen_bra_name}"
+		                             th:field="*{gen_bra_id}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -121,7 +136,8 @@
 		                            <option
 		                             th:each="branch : ${branch}"
 		                             th:value="${branch.branch_id}"
-		                             th:text="${branch.branch_name}">
+		                             th:text="${branch.branch_name}"
+		                             th:field="*{branch_id}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -143,7 +159,8 @@
 		                            <option
 		                             th:each="empJob : ${empJob}"
 		                             th:value="${empJob.emp_job_id}"
-		                             th:text="${empJob.emp_job_name}">
+		                             th:text="${empJob.emp_job_name}"
+		                             th:field="*{emp_job_id}">
 		                            </option>
 		                         </select>
 	                        </div>
@@ -165,9 +182,11 @@
 	                            <option
 	                            	th:each="employmentType : ${employmentType}"
 	                            	th:value="${employmentType.key}"
-							      	th:text="${employmentType.value}">
+							      	th:text="${employmentType.value}"
+							      	th:field="*{employment_type}">
 							    </option>
 	                            </select>
+	                            <span class="errorStr" th:errors="*{employment_type}"></span>
 	                        </div>
 	                    </td>
 	                </tr>
@@ -177,6 +196,7 @@
 	                        <div class="form-group">
 	                            <div th:each="item : ${radioButton}" class="form-check-inline">
 		                            <input type="radio"  class="form-check-input" th:text="${item.value}" th:value="${item.key}" th:field="*{org_kbn}">
+		                        	<span class="errorStr" th:errors="*{org_kbn}"></span>
 		                        </div>
 	                        </div>
 	                    </td>
@@ -186,6 +206,22 @@
 	                    <td>
 	                        <div class="form-group">
 	                            <input type="date" class="form-control" th:field="*{start_date}"></input>
+	                        	<span class="errorStr" th:errors="*{start_date}"></span>
+	                        </div>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <th class="active">出向先法人名</th>
+	                    <td>
+	                        <div class="form-group">
+	                        	<select id="second_company_id" name="second_company_id" th:field="*{second_company_id}">
+		                            <option value="" selected></option>
+		                            <option
+		                             th:each="company : ${company}"
+		                             th:value="${company.company_id}"
+		                             th:text="${company.company_name}">
+		                            </option>
+		                         </select>
 	                        </div>
 	                    </td>
 	                </tr>
