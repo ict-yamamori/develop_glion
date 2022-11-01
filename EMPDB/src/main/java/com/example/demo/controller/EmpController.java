@@ -165,7 +165,7 @@ public class EmpController {
 				employee.getSecond_company_id());
 		
 		//一覧画面にリダイレクト（登録完了画面あればいい）
-		return "redirect:/index";
+		return "redirect:/";
 	}
 	
 	//編集画面の表示のGETメソッド
@@ -472,7 +472,7 @@ public class EmpController {
 	@GetMapping("/search")
 	public String search(@RequestParam String empName, @RequestParam String empName_kana, @RequestParam String companyName, Model model) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type,org_kbn,m_employee.mail_address,m_employee.telephone_number,m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_second_company.company_name as B,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,org_kbn,start_date,end_date FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id JOIN m_second_company ON m_second_company.id = t_orgnization.second_company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id");
+		sql.append("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type,org_kbn,m_employee.mail_address,m_employee.telephone_number,m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_second_company.company_name as B,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,org_kbn,start_date,end_date FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id LEFT OUTER JOIN m_second_company ON m_second_company.id = t_orgnization.second_company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id");
 		
 		if (!"".equals(empName)) {
 			sql.append(" where employee_id in (select id from m_employee where name like '%" + empName + "%')");
@@ -481,7 +481,6 @@ public class EmpController {
 			}
 			if (!"".equals(companyName)) {
 				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
-				//second_company_sql.append(" where second_company_id in (select id from m_company where company_name like '%" + companyName + "%')");
 			}
 		} else if (!"".equals(empName_kana)) {
 			sql.append(" where employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
@@ -490,7 +489,6 @@ public class EmpController {
 			}
 			if (!"".equals(companyName)) {
 				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
-				//second_company_sql.append(" where second_company_id in (select id from m_company where company_name like '%" + companyName + "%')");
 			}
 		} else if (!"".equals(companyName)) {
 			sql.append(" where company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
@@ -576,7 +574,7 @@ public class EmpController {
             System.out.println("ファイル読み込みに失敗");
         }
 		    
-		return "redirect:/index";
+		return "redirect:/";
 	}
 	
 	//CSVエクスポートのPOSTメソッド
