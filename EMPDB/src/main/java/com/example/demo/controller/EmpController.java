@@ -380,7 +380,7 @@ public class EmpController {
 	
 	//兼務情報を登録のPOSTメソッド
 	@PostMapping("/employeeDetail/{id}/sub")
-	public String postSub(@PathVariable("id") String id,Employee employee,RedirectAttributes attributes, Model model) {
+	public String postSub(@PathVariable("id") String id, Employee employee,RedirectAttributes attributes, Model model) {
 		//empidを取得する
 		int emp_id = jdbcTemplate.queryForObject("select employee_id from t_orgnization where id = " + id,Integer.class);
 		
