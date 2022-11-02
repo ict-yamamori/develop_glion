@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+  <m_employee
+ 	  id="1"
+      name="サンプル　一郎"
+      name_kana="サンプル　イチロウ"
+      status="在職"
+      telephone_number="090-0000-0001"
+      mail_address="sample01@example.com"
+      entering_date="2022-04-01"
+  />
+</dataset>

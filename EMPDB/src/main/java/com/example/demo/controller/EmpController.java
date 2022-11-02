@@ -380,53 +380,7 @@ public class EmpController {
 	
 	//兼務情報を登録のPOSTメソッド
 	@PostMapping("/employeeDetail/{id}/sub")
-	public String postSub(@PathVariable("id") String id, @Validated Employee employee,BindingResult bindingResult,RedirectAttributes attributes, Model model) {
-		if (bindingResult.hasErrors()) {
-			//従業員情報をidから取得
-			employee = empService.selectOne(id);
-			
-			//リダイレクト先にパラメータを渡す	
-			attributes.addFlashAttribute("org.springframework.validation.BindingResult.employee", bindingResult);
-            attributes.addFlashAttribute("employee", employee);
-            
-			//事業本部のプルダウンを表示する
-			List<BusinessOrgnization> bus_org = empService.getBusinessOrgnizationAll();
-			attributes.addFlashAttribute("bus_org", bus_org);
-			
-			//事業部のプルダウンリスト表示
-			List<Division> division = empService.getDivisionAll();
-			attributes.addFlashAttribute("division", division);
-			
-			//法人のプルダウンリスト表示
-			List<Company> company = empService.getCompanyAll();
-			attributes.addFlashAttribute("company", company);
-			
-			//拠点統括のプルダウンリスト表示
-			List<GeneralBranch> genBra = empService.getGenBraAll();
-			attributes.addFlashAttribute("genBra", genBra);
-			
-			//拠点のプルダウンリスト表示
-			List<Branch> branch = empService.getBranchAll();
-			attributes.addFlashAttribute("branch", branch);
-
-			//職務のプルダウンリスト表示
-			List<EmpJob> empJob = empService.getEmpJobAll();
-			attributes.addFlashAttribute("empJob", empJob);
-			
-			//雇用体系のプルダウン表示
-			Map<String, String> employmentType= new LinkedHashMap<String, String>();
-			employmentType.put("正社員","正社員");
-			employmentType.put("役員","役員");
-			employmentType.put("ﾊﾟｰﾄ･ｱﾙﾊﾞｲﾄ","ﾊﾟｰﾄ･ｱﾙﾊﾞｲﾄ");
-			employmentType.put("業務委託","業務委託");
-			employmentType.put("契約社員","契約社員");
-			employmentType.put("派遣","派遣");
-			employmentType.put("嘱託","嘱託");
-			attributes.addFlashAttribute("employmentType", employmentType);
-			
-            return "redirect:/employeeDetail/{id}/sub";
-        }
-		
+	public String postSub(@PathVariable("id") String id, Employee employee,RedirectAttributes attributes, Model model) {
 		//empidを取得する
 		int emp_id = jdbcTemplate.queryForObject("select employee_id from t_orgnization where id = " + id,Integer.class);
 		
