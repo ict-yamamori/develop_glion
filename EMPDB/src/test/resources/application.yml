@@ -1,0 +1,12 @@
+#spring:
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:empdb;MODE=MySQL;DATABASE_TO_LOWER=TRUE  # H2DBをインメモリ、MySQL互換モードで利用
+#    username: sa
+#    password: 
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:schema.sql # test/resources/schema.sql
+#      data-locations: classpath:data.sql     # test/resources/data.sql
+#      encoding: utf-8
