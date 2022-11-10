@@ -30,13 +30,11 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //初期表示画面を表示する際にBasic認証を実施する
-        http.antMatcher("/").httpBasic()
-                .and()   //かつ
-                //それ以外の画面は全て認証を有効にする
-                .authorizeRequests().anyRequest().authenticated()
-                .and()   //かつ
-                //リクエスト毎に認証を実施するようにする
-                .sessionManagement().sessionCreationPolicy(
-                                 SessionCreationPolicy.STATELESS);
+        http.httpBasic();
+        http.authorizeRequests().anyRequest().authenticated()
+        .and()   //かつ
+        //リクエスト毎に認証を実施するようにする
+        .sessionManagement().sessionCreationPolicy(
+                         SessionCreationPolicy.STATELESS);
     }
 }

@@ -36,6 +36,9 @@ dependencies {
 	testImplementation 'org.dbunit:dbunit:2.7.3'
 	testRuntimeOnly 'com.h2database:h2'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// https://mvnrepository.com/artifact/com.github.csueiras.acme/spring-boot-starter-acme
+	implementation group: 'com.github.csueiras.acme', name: 'spring-boot-starter-acme', version: '0.1.0'
+
 }
 
 tasks.named('test') {
