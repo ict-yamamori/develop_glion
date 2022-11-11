@@ -28,7 +28,7 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
      */
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
-        //初期表示画面を表示する際にBasic認証を実施する
+		//Basic認証の設定
         http.httpBasic();
         http.authorizeRequests().anyRequest().authenticated();
         http
