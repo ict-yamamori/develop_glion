@@ -57,6 +57,7 @@
             <th>雇用体系</th>
             <th>在職状況</th>
             <th>入社日</th>
+            <th>出向先</th>
             <th></th>
         </tr>
         <tr th:each="list : ${employeeList}">
@@ -66,6 +67,7 @@
             <td th:text="${list.employment_type}"></td>
             <td th:text="${list.status}"></td>
             <td th:text="${list.entering_date}"></td>
+            <td th:text="${list.B}"></td>
             <td>
             	<a class="btn btn-primary" th:href="@{'/employeeDetail/' + ${list.id}}">詳細</a>
             </td>

@@ -434,7 +434,7 @@ public class EmpController {
 				sql.append(" and employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
 			}
 			if (!"".equals(companyName)) {
-				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
+				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or employee_id in (select id from m_employee where name like '%" + empName + "%') and second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
 			}
 		} else if (!"".equals(empName_kana)) {
 			sql.append(" where employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
@@ -442,7 +442,7 @@ public class EmpController {
 				sql.append(" and employee_id in (select id from m_employee where name like '%" + empName + "%')");
 			}
 			if (!"".equals(companyName)) {
-				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
+				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%') and second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
 			}
 		} else if (!"".equals(companyName)) {
 			sql.append(" where company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
