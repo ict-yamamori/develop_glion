@@ -52,44 +52,20 @@
 		<table class="table table-bordered table-striped">
         <tr>
             <th>氏名</th>
-            <th>在職状況</th>
-            <th>グループ入社日</th>
-            <th>グループ退職日</th>
-            <th>雇用体系</th>
-            <th>メールアドレス</th>
-            <th>電話番号</th>
-            <th>事業本部</th>
-            <th>事業部</th>
             <th>法人</th>
-            <th>拠点統括</th>
-            <th>拠点</th>
-            <th>部署</th>
-            <th>役職</th>
             <th>職務</th>
-            <th>所属開始日</th>
-            <th>所属終了日</th>
-            <th>出向先</th>
+            <th>雇用体系</th>
+            <th>在職状況</th>
+            <th>入社日</th>
             <th></th>
         </tr>
         <tr th:each="list : ${employeeList}">
         	<td th:text="${list.name}"></td>
-        	<td th:text="${list.status}"></td>
-        	<td th:text="${list.entering_date}"></td>
-        	<td th:text="${list.leaving_date}"></td>
-        	<td th:text="${list.employment_type}"></td>
-        	<td th:text="${list.mail_address}"></td>
-        	<td th:text="${list.telephone_number}"></td>
-        	<td th:text="${list.business_org_name}"></td>
-        	<td th:text="${list.division_name}"></td>
         	<td th:text="${list.company_name}"></td>
-        	<td th:text="${list.gen_bra_name}"></td>
-        	<td th:text="${list.branch_name}"></td>
-        	<td th:text="${list.department}"></td>
-            <td th:text="${list.official_position}"></td>
             <td th:text="${list.emp_job_name}"></td>
-            <td th:text="${list.start_date}"></td>
-            <td th:text="${list.end_date}"></td>
-            <td th:text="${list.B}"></td>
+            <td th:text="${list.employment_type}"></td>
+            <td th:text="${list.status}"></td>
+            <td th:text="${list.entering_date}"></td>
             <td>
             	<a class="btn btn-primary" th:href="@{'/employeeDetail/' + ${list.id}}">詳細</a>
             </td>

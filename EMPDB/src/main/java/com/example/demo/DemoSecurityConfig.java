@@ -5,7 +5,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 
 @SuppressWarnings("deprecation")
@@ -31,10 +30,8 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
     protected void configure(HttpSecurity http) throws Exception {
         //初期表示画面を表示する際にBasic認証を実施する
         http.httpBasic();
-        http.authorizeRequests().anyRequest().authenticated()
-        .and()   //かつ
-        //リクエスト毎に認証を実施するようにする
-        .sessionManagement().sessionCreationPolicy(
-                         SessionCreationPolicy.STATELESS);
+        http.authorizeRequests().anyRequest().authenticated();
+        http
+        .csrf().disable();
     }
 }

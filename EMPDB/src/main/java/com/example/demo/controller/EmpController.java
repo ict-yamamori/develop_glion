@@ -527,7 +527,6 @@ public class EmpController {
         } catch (IOException e) {
             System.out.println("ファイル読み込みに失敗");
         }
-		    
 		return "redirect:/";
 	}
 	
