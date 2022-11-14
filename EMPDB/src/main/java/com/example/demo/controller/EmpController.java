@@ -483,44 +483,49 @@ public class EmpController {
                 if (index > 0) {
                     String[] data = line.split(",");
                 	//従業員テーブルにinsert
-                	jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,entering_date)"
-            				+ " values(\"" + data[0] + "\",\"" + data[1] + "\",\"" + data[2] + "\",\"" + data[3] + "\",\"" + data[4] + "\",\"" + data[5] + "\")");
+                	jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,entering_date,leaving_date)"
+            				+ " values(\"" + data[0] + "\",\"" + data[1] + "\",\"" + data[2] + "\",\"" + data[3] + "\",\"" + data[4] + "\",\"" + data[5] + "\",\"" + data[6] + "\")");
                 	
                 	//所属テーブルのインポートに必要な各IDを取得する
             		int emp_id = jdbcTemplate.queryForObject("select MAX(id) from m_employee",Integer.class);
             		
-            		int bus_org_id = jdbcTemplate.queryForObject("select id from m_business_org where business_org_name like '%" + data[6] + "%'",Integer.class);
+            		int bus_org_id = jdbcTemplate.queryForObject("select id from m_business_org where business_org_name like '%" + data[7] + "%'",Integer.class);
             		
             		Integer division_id = null;
-            		if (data[7] != null) {
-            			division_id = jdbcTemplate.queryForObject("select id from m_division where division_name like '%" + data[7] + "%'",Integer.class);
+            		if (data[8] != null) {
+            			division_id = jdbcTemplate.queryForObject("select id from m_division where division_name like '%" + data[8] + "%'",Integer.class);
             		}
             			
-            		int company_id = jdbcTemplate.queryForObject("select id from m_company where company_name like '%" + data[8] + "%'",Integer.class);
+            		int company_id = jdbcTemplate.queryForObject("select id from m_company where company_name like '%" + data[9] + "%'",Integer.class);
             		
             		
-            		Integer gen_bra_id = null;
-            		if (data[9].length() != 0) {
-            			gen_bra_id = jdbcTemplate.queryForObject("select id from m_general_branch where gen_bra_name like '%" + data[9] + "%'",Integer.class);
-            		}
+//            		Integer gen_bra_id = null;
+//            		if (data[9].length() != 0) {
+//            			gen_bra_id = jdbcTemplate.queryForObject("select id from m_general_branch where gen_bra_name like '%" + data[9] + "%'",Integer.class);
+//            		}
+//            			
+//            		Integer branch_id = null;
+//            		if (data[10].length() != 0) {
+//            			branch_id = jdbcTemplate.queryForObject("select id from m_branch where branch_name like '%" + data[10] + "%'",Integer.class);
+//            		}
             			
-            		Integer branch_id = null;
-            		if (data[10].length() != 0) {
-            			branch_id = jdbcTemplate.queryForObject("select id from m_branch where branch_name like '%" + data[10] + "%'",Integer.class);
-            		}
-            			
-            		int emp_job_id = jdbcTemplate.queryForObject("select id from m_emp_job where emp_job_name like '%" + data[12] + "%'",Integer.class);
+            		int emp_job_id = jdbcTemplate.queryForObject("select id from m_emp_job where emp_job_name like '%" + data[13] + "%'",Integer.class);
             		
             		boolean org_kbn;
-            		if (data[15].equals("メイン所属")) {
+            		if (data[16].equals("メイン所属")) {
             			org_kbn = true;
             		} else {
             			org_kbn = false;
             		}
             		
+            		Integer second_companay_id = null;
+            		if (data[18] != null) {
+            			second_companay_id = jdbcTemplate.queryForObject("select id from m_second_company where second_company_name like '%" + data[18] + "%'",Integer.class);
+            		}
+            		
                 	//所属テーブルにinsert
-                	jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date)"
-            				+ "values(" + emp_id +"," + bus_org_id + "," + division_id + "," + company_id + "," + gen_bra_id + "," + branch_id +",\"" + data[11] + "\"," + emp_job_id + ",\"" + data[13] + "\",\"" + data[14] + "\"," + org_kbn + ",\"" + data[16] + "\")");
+                	jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date,end_date,second_company_id)"
+            				+ "values(" + emp_id +"," + bus_org_id + "," + division_id + "," + company_id + "," + data[10] + "," + data[11] +",\"" + data[12] + "\"," + emp_job_id + ",\"" + data[14] + "\",\"" + data[15] + "\"," + org_kbn + ",\"" + data[17] + "\"," + second_companay_id + ")");
                 }
                 index++;
             }
