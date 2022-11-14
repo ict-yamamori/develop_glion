@@ -550,7 +550,7 @@ public class EmpController {
 	}
 	
 	//CSVエクスポートのPOSTメソッド
-	@GetMapping(value = "/employee_data.csv", produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
+	@PostMapping(value = "/employee_data.csv", produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
 		      + "; charset=UTF-8; Content-Disposition: attachment")
 	@ResponseBody
 	public Object csvExport(@ModelAttribute("csvForm") csv records) throws JsonProcessingException {
