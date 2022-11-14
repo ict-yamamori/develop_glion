@@ -473,6 +473,7 @@ public class EmpController {
 	}
 	
 	//CSVインポートのPOSTメソッド
+	@PostMapping(value = "/importFile", params = "upload_file")
 	public String updaloadFile(@RequestParam("file") MultipartFile uploadFile, Model model) {		
 		// CSVファイルの読み込み
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(uploadFile.getInputStream(), StandardCharsets.UTF_8))){
