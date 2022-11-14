@@ -13,9 +13,6 @@
         <tr>
             <th>氏名</th>
             <th>法人</th>
-            <th>拠点統括</th>
-            <th>拠点</th>
-            <th>役職</th>
             <th>職務</th>
             <th>雇用体系</th>
             <th>在職状況</th>
@@ -25,9 +22,6 @@
         <tr th:each="list : ${employeeList}">
         	<td th:text="${list.name}"></td>
         	<td th:text="${list.company_name}"></td>
-        	<td th:text="${list.gen_bra_name}"></td>
-        	<td th:text="${list.branch_name}"></td>
-            <td th:text="${list.official_position}"></td>
             <td th:text="${list.emp_job_name}"></td>
             <td th:text="${list.employment_type}"></td>
             <td th:text="${list.status}"></td>

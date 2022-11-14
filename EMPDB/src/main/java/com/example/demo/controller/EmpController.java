@@ -434,7 +434,7 @@ public class EmpController {
 				sql.append(" and employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
 			}
 			if (!"".equals(companyName)) {
-				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
+				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or employee_id in (select id from m_employee where name like '%" + empName + "%') and second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
 			}
 		} else if (!"".equals(empName_kana)) {
 			sql.append(" where employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
@@ -442,7 +442,7 @@ public class EmpController {
 				sql.append(" and employee_id in (select id from m_employee where name like '%" + empName + "%')");
 			}
 			if (!"".equals(companyName)) {
-				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
+				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%') and second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
 			}
 		} else if (!"".equals(companyName)) {
 			sql.append(" where company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
@@ -482,57 +482,73 @@ public class EmpController {
             while ((line = reader.readLine()) != null) {
                 if (index > 0) {
                     String[] data = line.split(",");
-                	//従業員テーブルにinsert
-                	jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,entering_date)"
-            				+ " values(\"" + data[0] + "\",\"" + data[1] + "\",\"" + data[2] + "\",\"" + data[3] + "\",\"" + data[4] + "\",\"" + data[5] + "\")");
+                    
+                    if (data[6].equals("")) {
+                    	//従業員テーブルにinsert
+                    	jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,entering_date,leaving_date)"
+                				+ " values(\"" + data[0] + "\",\"" + data[1] + "\",\"" + data[2] + "\",\"" + data[3] + "\",\"" + data[4] + "\",\"" + data[5] + "\"," + null + ")");
+                    } else {
+                    	//従業員テーブルにinsert
+                    	jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,entering_date,leaving_date)"
+                				+ " values(\"" + data[0] + "\",\"" + data[1] + "\",\"" + data[2] + "\",\"" + data[3] + "\",\"" + data[4] + "\",\"" + data[5] + "\",\"" + data[6] + "\")");
+                    }
                 	
                 	//所属テーブルのインポートに必要な各IDを取得する
             		int emp_id = jdbcTemplate.queryForObject("select MAX(id) from m_employee",Integer.class);
             		
-            		int bus_org_id = jdbcTemplate.queryForObject("select id from m_business_org where business_org_name like '%" + data[6] + "%'",Integer.class);
+            		int bus_org_id = jdbcTemplate.queryForObject("select id from m_business_org where business_org_name like '%" + data[7] + "%'",Integer.class);
             		
             		Integer division_id = null;
-            		if (data[7] != null) {
-            			division_id = jdbcTemplate.queryForObject("select id from m_division where division_name like '%" + data[7] + "%'",Integer.class);
+            		if (!(data[8].equals(""))) {
+            			division_id = jdbcTemplate.queryForObject("select id from m_division where division_name like '%" + data[8] + "%'",Integer.class);
             		}
             			
-            		int company_id = jdbcTemplate.queryForObject("select id from m_company where company_name like '%" + data[8] + "%'",Integer.class);
-            		
+            		int company_id = jdbcTemplate.queryForObject("select id from m_company where company_name like '%" + data[9] + "%'",Integer.class);
             		
             		Integer gen_bra_id = null;
-            		if (data[9].length() != 0) {
-            			gen_bra_id = jdbcTemplate.queryForObject("select id from m_general_branch where gen_bra_name like '%" + data[9] + "%'",Integer.class);
+            		if (data[10].length() != 0) {
+            			gen_bra_id = jdbcTemplate.queryForObject("select id from m_general_branch where gen_bra_name like '%" + data[10] + "%'",Integer.class);
             		}
             			
             		Integer branch_id = null;
-            		if (data[10].length() != 0) {
-            			branch_id = jdbcTemplate.queryForObject("select id from m_branch where branch_name like '%" + data[10] + "%'",Integer.class);
+            		if (data[11].length() != 0) {
+            			branch_id = jdbcTemplate.queryForObject("select id from m_branch where branch_name like '%" + data[11] + "%'",Integer.class);
             		}
             			
-            		int emp_job_id = jdbcTemplate.queryForObject("select id from m_emp_job where emp_job_name like '%" + data[12] + "%'",Integer.class);
+            		int emp_job_id = jdbcTemplate.queryForObject("select id from m_emp_job where emp_job_name like '%" + data[13] + "%'",Integer.class);
             		
             		boolean org_kbn;
-            		if (data[15].equals("メイン所属")) {
+            		if (data[19].equals("メイン所属")) {
             			org_kbn = true;
             		} else {
             			org_kbn = false;
             		}
             		
-                	//所属テーブルにinsert
-                	jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date)"
-            				+ "values(" + emp_id +"," + bus_org_id + "," + division_id + "," + company_id + "," + gen_bra_id + "," + branch_id +",\"" + data[11] + "\"," + emp_job_id + ",\"" + data[13] + "\",\"" + data[14] + "\"," + org_kbn + ",\"" + data[16] + "\")");
+            		Integer second_companay_id = null;
+            		if (data[18].length() != 0) {
+            			second_companay_id = jdbcTemplate.queryForObject("select id from m_second_company where company_name like '%" + data[18] + "%'",Integer.class);
+            		}
+            		
+            		if (data[17].equals("")) {
+            			//所属テーブルにinsert
+                    	jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date,end_date,second_company_id)"
+                				+ "values(" + emp_id +"," + bus_org_id + "," + division_id + "," + company_id + "," + gen_bra_id + "," + branch_id +",\"" + data[12] + "\"," + emp_job_id + ",\"" + data[14] + "\",\"" + data[15] + "\"," + org_kbn + ",\"" + data[16] + "\"," + null + "," + second_companay_id + ")");
+            		} else {
+            			//所属テーブルにinsert
+                    	jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date,end_date,second_company_id)"
+                				+ "values(" + emp_id +"," + bus_org_id + "," + division_id + "," + company_id + "," + gen_bra_id + "," + branch_id +",\"" + data[12] + "\"," + emp_job_id + ",\"" + data[14] + "\",\"" + data[15] + "\"," + org_kbn + ",\"" + data[16] + "\",\"" + data[17] + "\"," + second_companay_id + ")");
+            		}
                 }
                 index++;
             }
         } catch (IOException e) {
             System.out.println("ファイル読み込みに失敗");
         }
-		    
 		return "redirect:/";
 	}
 	
 	//CSVエクスポートのPOSTメソッド
-	@GetMapping(value = "/employee_data.csv", produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
+	@PostMapping(value = "/employee_data.csv", produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
 		      + "; charset=UTF-8; Content-Disposition: attachment")
 	@ResponseBody
 	public Object csvExport(@ModelAttribute("csvForm") csv records) throws JsonProcessingException {
