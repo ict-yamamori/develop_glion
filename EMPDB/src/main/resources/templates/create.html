@@ -10,7 +10,7 @@
 	<div class="container">
 		<div class="col-sm-5">
 	        <div class="page-header">
-	            <h2>従業員登録</h2>
+	            <p class="fs-2 my-2 fw-bold">従業員登録</p>
 	        </div>
 	        <!-- エラーメッセージの一覧表示 -->
             <ul>
@@ -18,7 +18,7 @@
                     <span th:text="${error.message}">Error message</span>
                 </li>
             </ul>
-	        <form method="post" th:object="${employee}" th:action="@{postCreate}" novalidate>
+	        <form method="post" th:object="${employee}" th:action="@{postCreate}">
 	            <table class="table table-bordered table-hover">
 	                <tr>
 	                    <th class="active">氏名</th>

@@ -45,25 +45,12 @@ public class EmpService {
 	private EmpJobRepository empJobRepository;
 	
 	//従業員情報 主キー検索（詳細表示）
-	public Employee selectOne(String id) {
+	public Employee selectOne(int id) {
 		return dao.selectOne(id);
 	}
 	
-	public boolean insert(Employee employee) {
-		//insert実行
-		int rowNumber = dao.insertOne(employee);
-		
-		//判定用変数
-		boolean result = false;
-		
-		System.out.println(rowNumber);
-		
-		if (rowNumber > 0) {
-			//insert成功
-			result = true;
-		}
-		
-		return result;
+	public List<Employee> selectAll() {
+		return dao.selectAll();
 	}
 	
 	public List<BusinessOrgnization> getBusinessOrgnizationAll() {
@@ -88,5 +75,21 @@ public class EmpService {
 	
 	public List<EmpJob> getEmpJobAll() {
 		return empJobRepository.findAll();
+	}
+
+	public void insertOne(Employee employee) {
+		dao.insertOne(employee);
+	}
+	
+	public void editOne(Employee employee, int id) {
+		dao.editOne(employee, id);
+	}
+	
+	public int insertSub(Employee employee, int id) {
+		return dao.insertSub(employee, id);
+	}
+	
+	public List<Employee> searchEmp(String empName, String empName_kana, String companyName) {
+		return dao.searchEmp(empName, empName_kana, companyName);
 	}
 }

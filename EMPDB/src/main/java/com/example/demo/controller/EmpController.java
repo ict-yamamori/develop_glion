@@ -66,9 +66,20 @@ public class EmpController {
 		return radio;
 	}
 	
+	//従業員一覧画面の表示
+	@GetMapping("/")
+	public String index(Model model) {
+		//従業員一覧の生成
+		List<Employee> employeeList = empService.selectAll();
+		//modelに従業員リストを登録
+		model.addAttribute("employeeList", employeeList);
+		
+		return "index";
+	}
+	
 	//従業員情報詳細画面の表示
 	@GetMapping("/employeeDetail/{id}")
-	public String getEmployeeDetail(Model model,@PathVariable("id") String id) {
+	public String getEmployeeDetail(Model model,@PathVariable("id") int id) {
 		//従業員情報を取得
 		Employee employee = empService.selectOne(id);
 		model.addAttribute("employee", employee);
@@ -82,7 +93,7 @@ public class EmpController {
 		//バリデーションエラーが出た場合データを保持した状態で表示する
 		if (!model.containsAttribute("employee")) {
 	        model.addAttribute("employee", new Employee());
-	      }
+		}
 		
 		//事業本部のプルダウンを表示する
 		List<BusinessOrgnization> bus_org = empService.getBusinessOrgnizationAll();
@@ -111,7 +122,7 @@ public class EmpController {
 		//メイン所属・兼務のラジオボタン表示
 		radioButton = initRadioButton();
 		model.addAttribute("radioButton", radioButton);
-		
+
 		//雇用体系のプルダウン表示
 		Map<String, String> employmentType= new LinkedHashMap<String, String>();
 		employmentType.put("正社員","正社員");
@@ -130,7 +141,7 @@ public class EmpController {
 	//従業員登録のPOSTメソッド
 	@PostMapping("/postCreate")
 	public String postCreate(@Validated Employee employee, BindingResult bindingResult, Model model, RedirectAttributes attributes) {	
-		
+		//バリデーション時に入力内容を保持しつつリダイレクト
 		if (bindingResult.hasErrors()) {
 			attributes.addFlashAttribute("org.springframework.validation.BindingResult.employee", bindingResult);
             attributes.addFlashAttribute("employee", employee);
@@ -138,32 +149,8 @@ public class EmpController {
 			return "redirect:/create";
         }
 		
-		jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,entering_date)"
-				+ " values(?, ?, " + "\"在職\"" + ", ?, ?, ?)",
-				employee.getName(),
-				employee.getName_kana(),
-				employee.getTelephonenumber(),
-				employee.getMailaddress(),
-				employee.getEntering_date());
-		
-		//M_EMPLOYEEの最終更新ID取得
-		int emp_id = jdbcTemplate.queryForObject("select MAX(id) from m_employee",Integer.class);
-		
-		//T_ORGNIZATIONの登録処理
-		jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date,second_company_id)"
-				+ "values(" + emp_id +",?,?,?,?,?,?,?,?,?,?,?,?)",
-				employee.getBusiness_org_id(),
-				employee.getDivision_id(),
-				employee.getCompany_id(),
-				employee.getGen_bra_id(),
-				employee.getBranch_id(),
-				employee.getDepartment(),
-				employee.getEmp_job_id(),
-				employee.getOfficial_position(),
-				employee.getEmployment_type(),
-				employee.isOrg_kbn(),
-				employee.getStart_date(),
-				employee.getSecond_company_id());
+		//DBに従業員登録を行う
+		empService.insertOne(employee);
 		
 		//一覧画面にリダイレクト（登録完了画面あればいい）
 		return "redirect:/";
@@ -171,7 +158,7 @@ public class EmpController {
 	
 	//編集画面の表示のGETメソッド
 	@GetMapping("/employeeDetail/{id}/edit")
-	public String displayEdit(@PathVariable("id") String id, Model model) {
+	public String displayEdit(@PathVariable("id") int id, Model model) {
 		//バリデーションエラーが出た場合データを保持した状態で表示する
 		if (!model.containsAttribute("employee")) {
 			Employee employee = empService.selectOne(id);
@@ -229,7 +216,7 @@ public class EmpController {
 	
 	//更新処理のPOSTメソッド
 	@PostMapping("/employeeDetail/{id}/update")
-	public String postUpdate(@Validated Employee employee,BindingResult bindingResult,RedirectAttributes attributes,Model model,@PathVariable("id") String id) {
+	public String postUpdate(@Validated Employee employee,BindingResult bindingResult,RedirectAttributes attributes,Model model,@PathVariable("id") int id) {
 		if (bindingResult.hasErrors()) {
 			//従業員情報をidから取得
 			employee = empService.selectOne(id);
@@ -288,42 +275,14 @@ public class EmpController {
             return "redirect:/employeeDetail/{id}/edit";
         }
 		
-		//empidを取得する
-		int emp_id = jdbcTemplate.queryForObject("select employee_id from t_orgnization where id = " + id,Integer.class);
-		
-		//M_EMPLOYEEの更新処理
-		jdbcTemplate.update("update m_employee set name = ?,name_kana = ?,status = ?,telephone_number = ?,mail_address = ?,entering_date = ?, leaving_date = ? where id = " + emp_id,
-				employee.getName(),
-				employee.getName_kana(),
-				employee.getStatus(),
-				employee.getTelephonenumber(),
-				employee.getMailaddress(),
-				employee.getEntering_date(),
-				employee.getLeaving_date());
-		
-		
-		//T_ORGNIZATIONの更新処理
-		jdbcTemplate.update("update t_orgnization set employee_id = " + emp_id + ",business_org_id = ?,division_id = ?,company_id = ?,gen_bra_id = ?,branch_id = ?,department = ?,emp_job_id = ?,official_position = ?,employment_type = ?,org_kbn = ?,start_date = ?,end_date = ?,second_company_id = ? where id = " + id,
-				employee.getBusiness_org_id(),
-				employee.getDivision_id(),
-				employee.getCompany_id(),
-				employee.getGen_bra_id(),
-				employee.getBranch_id(),
-				employee.getDepartment(),
-				employee.getEmp_job_id(),
-				employee.getOfficial_position(),
-				employee.getEmployment_type(),
-				employee.isOrg_kbn(),
-				employee.getStart_date(),
-				employee.getEnd_date(),
-				employee.getSecond_company_id());
+		empService.editOne(employee,id);
 		
 		return "redirect:/employeeDetail/{id}";
 	}
 	
 	//兼務情報入力のGETメソッド
 	@GetMapping("/employeeDetail/{id}/sub")
-	public String displaySub(@PathVariable("id") String id, Model model) {
+	public String displaySub(@PathVariable("id") int id, Model model) {
 		//バリデーションエラーが出た場合データを保持した状態で表示する
 		if (!model.containsAttribute("employee")) {
 			Employee employee = empService.selectOne(id);
@@ -381,29 +340,9 @@ public class EmpController {
 	
 	//兼務情報を登録のPOSTメソッド
 	@PostMapping("/employeeDetail/{id}/sub")
-	public String postSub(@PathVariable("id") String id,Employee employee,RedirectAttributes attributes, Model model) {
-		//empidを取得する
-		int emp_id = jdbcTemplate.queryForObject("select employee_id from t_orgnization where id = " + id,Integer.class);
+	public String postSub(Employee employee, @PathVariable("id") int id, Model model) {
 		
-		//T_ORGNIZATIONの兼務情報をインサートする
-		jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date)"
-				+ "values(" + emp_id +",?,?,?,?,?,?,?,?,?," + false + ",?)",
-				employee.getBusiness_org_id(),
-				employee.getDivision_id(),
-				employee.getCompany_id(),
-				employee.getGen_bra_id(),
-				employee.getBranch_id(),
-				employee.getDepartment(),
-				employee.getEmp_job_id(),
-				employee.getOfficial_position(),
-				employee.getEmployment_type(),
-				employee.getStart_date());
-		
-		//兼務情報として登録したIDを取得する
-		int sub_id = jdbcTemplate.queryForObject("select MAX(id) from t_orgnization",Integer.class);
-		
-		//兼務情報をモデルに追加
-		model.addAttribute("employee", employee);
+		int sub_id = empService.insertSub(employee, id);
 		
 		return "redirect:/employeeDetail/" + sub_id;
 	}
@@ -423,40 +362,10 @@ public class EmpController {
 		return "search";
 	}
 	
-	//検索結果を表示するメソッド
 	@GetMapping("/search")
 	public String search(@RequestParam String empName, @RequestParam String empName_kana, @RequestParam String companyName, Model model) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type,org_kbn,m_employee.mail_address,m_employee.telephone_number,m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_second_company.company_name as B,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,org_kbn,start_date,end_date FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id LEFT OUTER JOIN m_second_company ON m_second_company.id = t_orgnization.second_company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id LEFT OUTER JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id");
-		
-		if (!"".equals(empName)) {
-			sql.append(" where employee_id in (select id from m_employee where name like '%" + empName + "%')");
-			if (!"".equals(empName_kana)) {
-				sql.append(" and employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
-			}
-			if (!"".equals(companyName)) {
-				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or employee_id in (select id from m_employee where name like '%" + empName + "%') and second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
-			}
-		} else if (!"".equals(empName_kana)) {
-			sql.append(" where employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
-			if (!"".equals(empName)) {
-				sql.append(" and employee_id in (select id from m_employee where name like '%" + empName + "%')");
-			}
-			if (!"".equals(companyName)) {
-				sql.append(" and company_id in (select id from m_company where company_name like '%" + companyName + "%') or employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%') and second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
-			}
-		} else if (!"".equals(companyName)) {
-			sql.append(" where company_id in (select id from m_company where company_name like '%" + companyName + "%') or second_company_id in (select id from m_second_company where company_name like '%" + companyName + "%')");
-			
-			if (!"".equals(empName_kana)) {
-				sql.append(" and employee_id in (select id from m_employee where name_kana like '%" + empName_kana + "%')");
-			}
-			if (!"".equals(empName)) {
-				sql.append(" and employee_id in (select id from m_employee where name like '%" + empName + "%')");
-			}
-		}
-		
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString());
+		//検索結果を取得
+		List<Employee> list = empService.searchEmp(empName, empName_kana, companyName);
 		
 		model.addAttribute("employeeList", list);
 		model.addAttribute("empName", empName);
@@ -475,7 +384,7 @@ public class EmpController {
 	
 	//CSVインポートのPOSTメソッド
 	@PostMapping(value = "/importFile", params = "upload_file")
-	public String updaloadFile(@RequestParam("file") MultipartFile uploadFile, Model model) {		
+	public String uploadFile(@RequestParam("file") MultipartFile uploadFile, Model model) {		
 		// CSVファイルの読み込み
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(uploadFile.getInputStream(), StandardCharsets.UTF_8))){
             String line;
