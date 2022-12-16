@@ -32,8 +32,8 @@
             <input type="hidden" name="entering_date" th:value="${list.entering_date}">
             <input type="hidden" name="leaving_date" th:value="${list.leaving_date}">
             <input type="hidden" name="employment_type" th:value="${list.employment_type}">
-            <input type="hidden" name="mail_address" th:value="${list.mail_address}">
-            <input type="hidden" name="telephone_number" th:value="${list.telephone_number}">
+            <input type="hidden" name="mail_address" th:value="${list.mailaddress}">
+            <input type="hidden" name="telephone_number" th:value="${list.telephonenumber}">
             <input type="hidden" name="business_org" th:value="${list.business_org_name}">
             <input type="hidden" name="division" th:value="${list.division_name}">
             <input type="hidden" name="company" th:value="${list.company_name}">
@@ -45,7 +45,7 @@
             <input type="hidden" name="org_kbn" th:value="${list.org_kbn}">
             <input type="hidden" name="start_date" th:value="${list.start_date}">
             <input type="hidden" name="end_date" th:value="${list.end_date}">
-            <input type="hidden" name="second_company" th:value="${list.B}">
+            <input type="hidden" name="second_company" th:value="${list.second_company_name}">
           </div>
           <button type="submit">CSVダウンロード</button>
         </form>
@@ -67,7 +67,7 @@
             <td th:text="${list.employment_type}"></td>
             <td th:text="${list.status}"></td>
             <td th:text="${list.entering_date}"></td>
-            <td th:text="${list.B}"></td>
+            <td th:text="${list.second_company_name}"></td>
             <td>
             	<a class="btn btn-primary" th:href="@{'/employeeDetail/' + ${list.id}}">詳細</a>
             </td>

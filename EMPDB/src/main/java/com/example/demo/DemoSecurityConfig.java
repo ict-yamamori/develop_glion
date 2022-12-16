@@ -26,7 +26,7 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
      * @param http HttpSecurityオブジェクト
      * @throws Exception 例外
      */
-    @Override
+	@Override
     protected void configure(HttpSecurity http) throws Exception {
 		//Basic認証の設定
         http.httpBasic();
