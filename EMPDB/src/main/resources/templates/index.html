@@ -19,7 +19,7 @@
             <th>入社日</th>
             <th></th>
         </tr>
-        <tr th:each="list : ${employeeList}">
+        <tr th:each="list : ${pageList}">
         	<td th:text="${list.name}"></td>
         	<td th:text="${list.company_name}"></td>
             <td th:text="${list.emp_job_name}"></td>
@@ -30,7 +30,40 @@
             	<a class="btn btn-primary" th:href="@{'/employeeDetail/' + ${list.id}}">詳細</a>
             </td>
         </tr>
-    </table>
+    	</table>
+    	<div class="float-right"
+		     th:with="s = ${(page.number + 3 > page.totalPages - 1)
+		                    ? (page.totalPages - 1 - 6)
+		                    : (page.number - 3)}">
+		
+		    <ul class="pagination pagination-sm">
+		        <li th:class="|page-item ${page.first ? 'disabled' : ''}|">
+		            <a class="page-link" aria-label="Previous"
+		               th:href="@{''(page=${page.number - 1})}">
+		                <span>&laquo;</span>
+		            </a>
+		        </li>
+		
+		
+		        <li th:each='i : ${#numbers.sequence((s < 0 ? 0 : s),
+		                            ((s < 0 ? 0 : s) + 6) > (page.totalPages - 1)
+		                           ? (page.totalPages - 1)
+		                           : ((s < 0 ? 0 : s) + 6))}'
+		            th:class="|page-item ${(page.number == i) ? 'active' : ''}|">
+		            <a class="page-link" th:href="@{''(page=${i})}">
+		                <span th:text='${i + 1}'>1</span>
+		            </a>
+		        </li>
+		
+		
+		        <li th:class="|page-item ${page.last ? 'disabled' : ''}|">
+		            <a class="page-link" aria-label="Next"
+		               th:href="@{''(page=${page.number + 1})}">
+		                <span>&raquo;</span>
+		            </a>
+		        </li>
+		    </ul>
+		</div>
 	</div>
     
     <script th:href="@{/webjars/jquery/3.3.1/js/jquery.min.js}"></script>

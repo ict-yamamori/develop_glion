@@ -3,9 +3,14 @@ package com.example.demo.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.Employee;
+import com.example.demo.entity.csv;
+import com.example.demo.entity.csvExport;
 import com.example.demo.entity.PullDown.Branch;
 import com.example.demo.entity.PullDown.BusinessOrgnization;
 import com.example.demo.entity.PullDown.Company;
@@ -49,8 +54,8 @@ public class EmpService {
 		return dao.selectOne(id);
 	}
 	
-	public List<Employee> selectAll() {
-		return dao.selectAll();
+	public Page<Employee> selectAll(Pageable pageable) {
+		return dao.selectAll(pageable);
 	}
 	
 	public List<BusinessOrgnization> getBusinessOrgnizationAll() {
@@ -91,5 +96,13 @@ public class EmpService {
 	
 	public List<Employee> searchEmp(String empName, String empName_kana, String companyName) {
 		return dao.searchEmp(empName, empName_kana, companyName);
+	}
+	
+	public void importCsv(MultipartFile uploadFile) {
+		dao.importCsv(uploadFile);
+	}
+	
+	public List<csvExport> exportCsv(csv records) {
+		return dao.exportCsv(records);
 	}
 }

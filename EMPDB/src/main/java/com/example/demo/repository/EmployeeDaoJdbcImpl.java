@@ -1,16 +1,27 @@
 package com.example.demo.repository;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.Employee;
+import com.example.demo.entity.csv;
+import com.example.demo.entity.csvExport;
 
 @Repository("EmployeeDaoJdbcImpl")
 public class EmployeeDaoJdbcImpl implements EmployeeDao{
@@ -23,7 +34,7 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 	public Employee selectOne(int id) throws DataAccessException {
 		
 		//一件取得
-		Map<String, Object> map = jdbcTemplate.queryForMap("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type, org_kbn,m_employee.mail_address,m_employee.telephone_number,m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,start_date,end_date,m_company.company_name FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id LEFT OUTER JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id" + " where t_orgnization.id = ?", id);
+		Map<String, Object> map = jdbcTemplate.queryForMap("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type, org_kbn,m_employee.mail_address,m_employee.pr_mail_address,m_employee.telephone_number,m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,start_date,end_date,m_company.company_name FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id LEFT OUTER JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id" + " where t_orgnization.id = ?", id);
 		
 		//出向情報のみ別SQLで取得（一括でやる方法わからない）
 		Map<String, Object> second_comp = jdbcTemplate.queryForMap("select m_company.company_name from t_orgnization LEFT OUTER JOIN m_company ON m_company.id = t_orgnization.second_company_id" + " where t_orgnization.id = ?", id);
@@ -35,6 +46,7 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 		employee.setId((int) map.get("id"));
 		employee.setName((String) map.get("name"));
 		employee.setMailaddress((String) map.get("mail_address"));
+		employee.setPr_mailaddress((String) map.get("pr_mail_address"));
 		employee.setName_kana((String) map.get("name_kana"));
 		employee.setStatus((String) map.get("status"));
 		employee.setEntering_date((Date) map.get("entering_date"));
@@ -59,12 +71,13 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 
 	@Override
 	public void insertOne(Employee employee) throws DataAccessException {
-		jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,entering_date)"
-		+ " values(?, ?, " + "\"在職\"" + ", ?, ?, ?)",
+		jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,pr_mail_address,entering_date)"
+		+ " values(?, ?, " + "\"在職\"" + ", ?, ?, ?, ?)",
 		employee.getName(),
 		employee.getName_kana(),
 		employee.getTelephonenumber(),
 		employee.getMailaddress(),
+		employee.getPr_mailaddress(),
 		employee.getEntering_date());
 
 		//M_EMPLOYEEの最終更新ID取得
@@ -90,7 +103,7 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 	@Override
 	public List<Employee> searchEmp(String empName, String empName_kana, String companyName) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type,org_kbn,nullif(m_employee.mail_address,''),nullif(m_employee.telephone_number,''),m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_second_company.company_name as B,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,org_kbn,start_date,end_date FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id LEFT OUTER JOIN m_second_company ON m_second_company.id = t_orgnization.second_company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id LEFT OUTER JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id");
+		sql.append("select t_orgnization.id,m_employee.name,m_employee.name_kana,m_employee.pr_mail_address,m_employee.status,m_employee.entering_date,m_employee.leaving_date,employment_type,org_kbn,nullif(m_employee.mail_address,''),nullif(m_employee.telephone_number,''),m_business_org.business_org_name,m_division.division_name,m_company.company_name,m_second_company.company_name as B,m_general_branch.gen_bra_name,m_branch.branch_name,department,official_position,m_emp_job.emp_job_name,org_kbn,start_date,end_date FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id LEFT OUTER JOIN m_second_company ON m_second_company.id = t_orgnization.second_company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id LEFT OUTER JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id");
 		
 		if (!"".equals(empName)) {
 			sql.append(" where employee_id in (select id from m_employee where name like '%" + empName + "%')");
@@ -132,6 +145,7 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 			employee.setId((int) map.get("id"));
 			employee.setName((String) map.get("name"));
 			employee.setName_kana((String) map.get("name_kana"));
+			employee.setPr_mailaddress((String) map.get("pr_mailadderess"));
 			employee.setStatus((String) map.get("status"));
 			employee.setEntering_date((Date) map.get("entering_date"));
 			employee.setLeaving_date((Date) map.get("leaving_date"));
@@ -149,7 +163,7 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 			employee.setStart_date((Date) map.get("start_date"));
 			employee.setEnd_date((Date) map.get("end_date"));
 			employee.setOrg_kbn((boolean) map.get("org_kbn"));
-			employee.setSecond_company_name((String) map.get("second_company_name"));
+			employee.setSecond_company_name((String) map.get("B"));
 			
 			//結果返却用のemployeeListに追加
 			employeeList.add(employee);
@@ -159,10 +173,13 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 	}
 
 	@Override
-	public List<Employee> selectAll() throws DataAccessException {
+	public Page<Employee> selectAll(Pageable pageable) throws DataAccessException {
 		
 		String sql = "select t_orgnization.id,m_employee.name,m_company.company_name,m_general_branch.gen_bra_name,m_branch.branch_name,m_emp_job.emp_job_name,employment_type,m_employee.entering_date,m_employee.status,official_position FROM t_orgnization LEFT OUTER JOIN m_division ON m_division.id = t_orgnization.division_id JOIN m_company ON m_company.id = t_orgnization.company_id JOIN m_business_org ON m_business_org.id = t_orgnization.business_org_id LEFT OUTER JOIN m_general_branch ON m_general_branch.id = t_orgnization.gen_bra_id LEFT OUTER JOIN m_branch ON m_branch.id = t_orgnization.branch_id LEFT OUTER JOIN m_emp_job ON m_emp_job.id = t_orgnization.emp_job_id LEFT OUTER JOIN m_employee ON m_employee.id = t_orgnization.employee_id";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		
+		//sizeで件数取得
+		int total = list.size();
 		
 		//結果返却用の変数
 		List<Employee> employeeList = new ArrayList<>();
@@ -186,7 +203,11 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 			employeeList.add(employee);
 		}
 		
-		return employeeList;
+		
+		//size取得が必要みたい0の部分を件数で取得するかな
+		Page<Employee> page = new PageImpl<Employee>(employeeList, pageable, total);
+		
+		return page;
 	}
 
 	@Override
@@ -195,12 +216,13 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 		int emp_id = jdbcTemplate.queryForObject("select employee_id from t_orgnization where id = " + id,Integer.class);
 		
 		//M_EMPLOYEEの更新処理
-		jdbcTemplate.update("update m_employee set name = ?,name_kana = ?,status = ?,telephone_number = ?,mail_address = ?,entering_date = ?, leaving_date = ? where id = " + emp_id,
+		jdbcTemplate.update("update m_employee set name = ?,name_kana = ?,status = ?,telephone_number = ?,mail_address = ?,pr_mail_address = ?,entering_date = ?, leaving_date = ? where id = " + emp_id,
 				employee.getName(),
 				employee.getName_kana(),
 				employee.getStatus(),
 				employee.getTelephonenumber(),
 				employee.getMailaddress(),
+				employee.getPr_mailaddress(),
 				employee.getEntering_date(),
 				employee.getLeaving_date());
 		
@@ -246,5 +268,207 @@ public class EmployeeDaoJdbcImpl implements EmployeeDao{
 		
 		return sub_id;
 	}
+
+	@Override
+	public void importCsv(MultipartFile uploadFile) {
+		
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(uploadFile.getInputStream(), StandardCharsets.UTF_8))){
+            String line;
+            int index = 0;
+            while ((line = reader.readLine()) != null) {
+                if (index > 0) {
+                    String[] data = line.split(",");
+                    System.out.println(Arrays.toString(data));
+                    
+                    if (data[6].equals("")) {
+                    	//従業員テーブルにinsert
+                    	jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,pr_mail_address,entering_date,leaving_date)"
+                				+ " values(\"" + data[0] + "\",\"" + data[1] + "\",\"" + data[2] + "\",\"" + data[3] + "\",\"" + data[4] + "\",\"" + data[19] + "\",\"" + data[5] + "\"," + null + ")");
+                    } else {
+                    	//従業員テーブルにinsert
+                    	jdbcTemplate.update("insert into m_employee (name,name_kana,status,telephone_number,mail_address,pr_mail_address,entering_date,leaving_date)"
+                				+ " values(\"" + data[0] + "\",\"" + data[1] + "\",\"" + data[2] + "\",\"" + data[3] + "\",\"" + data[4] + "\",\"" + data[19] + "\",\"" + data[5] + "\",\"" + data[6] + "\")");
+                    }
+                	
+                	//所属テーブルのインポートに必要な各IDを取得する
+            		int emp_id = jdbcTemplate.queryForObject("select MAX(id) from m_employee",Integer.class);
+            		
+            		int bus_org_id = jdbcTemplate.queryForObject("select id from m_business_org where business_org_name like '%" + data[7] + "%'",Integer.class);
+            		
+            		Integer division_id = null;
+            		if (!(data[8].equals(""))) {
+            			division_id = jdbcTemplate.queryForObject("select id from m_division where division_name like '%" + data[8] + "%'",Integer.class);
+            		}
+            			
+            		int company_id = jdbcTemplate.queryForObject("select id from m_company where company_name like '%" + data[9] + "%'",Integer.class);
+            		
+            		Integer gen_bra_id = null;
+            		if (data[10].length() != 0) {
+            			gen_bra_id = jdbcTemplate.queryForObject("select id from m_general_branch where gen_bra_name like '%" + data[10] + "%'",Integer.class);
+            		}
+            			
+            		Integer branch_id = null;
+            		if (data[11].length() != 0) {
+            			branch_id = jdbcTemplate.queryForObject("select id from m_branch where branch_name like '%" + data[11] + "%'",Integer.class);
+            		}
+            			
+            		Integer emp_job_id = null;
+            		if (data[13].length() != 0) {
+            			emp_job_id = jdbcTemplate.queryForObject("select id from m_emp_job where emp_job_name like '%" + data[13] + "%'",Integer.class);
+            		}
+            			
+            		boolean org_kbn;
+            		if (data[20].equals("メイン所属")) {
+            			org_kbn = true;
+            		} else {
+            			org_kbn = false;
+            		}
+            		
+            		Integer second_companay_id = null;
+            		if (data[18].length() != 0) {
+            			second_companay_id = jdbcTemplate.queryForObject("select id from m_second_company where company_name like '%" + data[18] + "%'",Integer.class);
+            		}
+            		
+            		if (data[17].equals("")) {
+            			//所属テーブルにinsert
+                    	jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date,end_date,second_company_id)"
+                				+ "values(" + emp_id +"," + bus_org_id + "," + division_id + "," + company_id + "," + gen_bra_id + "," + branch_id +",\"" + data[12] + "\"," + emp_job_id + ",\"" + data[14] + "\",\"" + data[15] + "\"," + org_kbn + ",\"" + data[16] + "\"," + null + "," + second_companay_id + ")");
+            		} else {
+            			//所属テーブルにinsert
+                    	jdbcTemplate.update("insert into t_orgnization (employee_id,business_org_id,division_id,company_id,gen_bra_id,branch_id,department,emp_job_id,official_position,employment_type,org_kbn,start_date,end_date,second_company_id)"
+                				+ "values(" + emp_id +"," + bus_org_id + "," + division_id + "," + company_id + "," + gen_bra_id + "," + branch_id +",\"" + data[12] + "\"," + emp_job_id + ",\"" + data[14] + "\",\"" + data[15] + "\"," + org_kbn + ",\"" + data[16] + "\",\"" + data[17] + "\"," + second_companay_id + ")");
+            		}
+                }
+                index++;
+            }
+        } catch (IOException e) {
+            System.out.println("ファイル読み込みに失敗");
+        }
+	}
+
+	@Override
+	public List<csvExport> exportCsv(csv records) {
+		List<csvExport> csvList = new ArrayList<>();
+		//レコードの数だけ繰り返し処理を行う
+		for (int i = 0; i < records.getName().size(); i++) {
+			//各カラムの空白文字をNULLに変換する
+			String leaving_date = null;
+			if (records.getLeaving_date().isEmpty()) {
+				leaving_date = null;
+			} else {
+				leaving_date = records.getLeaving_date().get(i).trim();
+			}
+			
+			String mail_address = null;
+			if (records.getMail_address().isEmpty()) {
+				mail_address = null;
+			} else {
+				mail_address = records.getMail_address().get(i).trim();
+			}
+			
+			String pr_mail_address = null;
+			if (records.getPr_mail_address().isEmpty()) {
+				pr_mail_address = null;
+			} else {
+				pr_mail_address = records.getPr_mail_address().get(i).trim();
+			}
+			
+			String telephone_number = null;
+			if (records.getTelephone_number().isEmpty()) {
+				telephone_number = null;
+			} else {
+				telephone_number = records.getTelephone_number().get(i).trim();
+			}
+			
+			String division = null;
+			if (records.getDivision().isEmpty()) {
+				division = null;
+			} else {
+				division = records.getDivision().get(i).trim();
+			}
+			
+			String gen_bra = null;
+			if (records.getGeneral_branch().isEmpty()) {
+				gen_bra = null;
+			} else {
+				gen_bra = records.getGeneral_branch().get(i).trim();
+			}
+			
+			String branch = null;
+			if (records.getBranch().isEmpty()) {
+				branch = null;
+			} else {
+				branch = records.getBranch().get(i).trim();
+			}
+			
+			String department = null;
+			if (records.getDepartment().isEmpty()) {
+				department = null;
+			} else {
+				department = records.getDepartment().get(i).trim();
+			}
+			
+			String emp_job = null;
+			if (records.getEmp_job().isEmpty()) {
+				emp_job = null;
+			} else {
+				emp_job = records.getEmp_job().get(i).trim();
+			}
+			
+			String official_position = null;
+			if (records.getOfficial_position().isEmpty()) {
+				official_position = null;
+			} else {
+				official_position = records.getOfficial_position().get(i).trim();
+			}
+			
+			String end_date = null;
+			if (records.getEnd_date().isEmpty()) {
+				end_date = null;
+			} else {
+				end_date = records.getEnd_date().get(i).trim();
+			}
+			
+			//所属区分のTRUE,FALSEを置換する
+			String org_kbn = null;
+			if (records.getOrg_kbn().get(i).equals("true")) {
+				org_kbn = "メイン所属";
+			} else {
+				org_kbn = "兼務";
+			}
+			
+			String second_company = null;
+			if (records.getSecond_company().isEmpty()) {
+				second_company = null;
+			} else {
+				second_company = records.getSecond_company().get(i).trim();
+			}
+			
+			csvList.add(new csvExport(records.getName().get(i),
+					records.getName_kana().get(i), 
+					records.getStatus().get(i), 
+					records.getEntering_date().get(i), 
+					leaving_date, 
+					records.getEmployment_type().get(i).trim(), 
+					mail_address, 
+					pr_mail_address,
+					telephone_number, 
+					records.getBusiness_org().get(i).trim(), 
+					division, 
+					records.getCompany().get(i).trim(), 
+					gen_bra, 
+					branch, 
+					department, 
+					official_position, 
+					emp_job, 
+					org_kbn, 
+					records.getStart_date().get(i).trim(), 
+					end_date,
+					second_company));
+		}
+		
+		return csvList;
+	}
+	
 	
 }
