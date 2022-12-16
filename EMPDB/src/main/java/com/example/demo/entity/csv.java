@@ -13,6 +13,7 @@ public class csv {
 	List <String> leaving_date;
 	List <String> employment_type;
 	List <String> mail_address;
+	List <String> pr_mail_address;
 	List <String> telephone_number;
 	List <String> business_org;
 	List <String> division;

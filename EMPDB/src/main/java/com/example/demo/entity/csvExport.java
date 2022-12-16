@@ -24,6 +24,8 @@ public class csvExport {
 	private String employment_type;
 	@JsonProperty("メールアドレス")
 	private String mail_address;
+	@JsonProperty("広報用メールアドレス")
+	private String pr_mail_address;
 	@JsonProperty("電話番号")
 	private String telephone_number;
 	@JsonProperty("事業本部")
@@ -57,7 +59,7 @@ public class csvExport {
 	public csvExport() {}
 
 	public csvExport(String name, String name_kana, String status, String entering_date, String leaving_date,
-			String employment_type, String mail_address, String telephone_number, String business_org, String division,
+			String employment_type, String mail_address, String pr_mail_address, String telephone_number, String business_org, String division,
 			String company, String general_branch, String branch, String department, String official_position,
 			String emp_job, String org_kbn, String start_date, String end_date, String second_company) {
 		
@@ -68,6 +70,7 @@ public class csvExport {
 		this.leaving_date = leaving_date;
 		this.employment_type = employment_type;
 		this.mail_address = mail_address;
+		this.pr_mail_address = pr_mail_address;
 		this.telephone_number = telephone_number;
 		this.business_org = business_org;
 		this.division = division;

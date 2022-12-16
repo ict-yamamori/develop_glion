@@ -24,7 +24,7 @@
         	<button class="btn btn-secondary" type="submit">検索</button>
       	</form>
 		<h3 class="my-2">検索結果</h3>
-		<form id="csvform" method="POST" th:action="@{/employee_data.csv}" th:object="${csvForm}">
+		<form id="csvform" method="POST" th:action="@{/export_data.csv}" th:object="${csvForm}">
           <div th:each="list:${employeeList}">
             <input type="hidden" name="name" th:value="${list.name}">
             <input type="hidden" name="name_kana" th:value="${list.name_kana}">
@@ -33,6 +33,7 @@
             <input type="hidden" name="leaving_date" th:value="${list.leaving_date}">
             <input type="hidden" name="employment_type" th:value="${list.employment_type}">
             <input type="hidden" name="mail_address" th:value="${list.mailaddress}">
+            <input type="hidden" name="pr_mail_address" th:value="${list.pr_mailaddress}">
             <input type="hidden" name="telephone_number" th:value="${list.telephonenumber}">
             <input type="hidden" name="business_org" th:value="${list.business_org_name}">
             <input type="hidden" name="division" th:value="${list.division_name}">

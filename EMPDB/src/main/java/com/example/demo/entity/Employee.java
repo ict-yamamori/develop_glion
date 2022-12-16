@@ -17,6 +17,7 @@ public class Employee {
 	private String status;
 	private String telephonenumber;
 	private String mailaddress;
+	private String pr_mailaddress;
 	@NotNull(message = "※グループ入社日を省略することはできません")
 	private Date entering_date;
 	private Date leaving_date;
@@ -43,4 +44,5 @@ public class Employee {
 	private Integer emp_job_id;
 	private boolean org_kbn;
 	private Integer second_company_id;
+	
 }
